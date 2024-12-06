@@ -56,6 +56,24 @@ def leer_excel_desde_drive(url):
 
     return df
 
+def leer_csv_desde_drive(url):
+    """
+    Descarga y lee un archivo Excel compartido desde Google Drive.
+    Elimina el archivo temporal después de leerlo.
+    Retorna un DataFrame.
+    """
+    archivo_temporal = 'archivo_temporal.csv'
+    descargar_archivo_drive(url, archivo_temporal)
+
+    try:
+        # Leer el archivo descargado en un DataFrame
+        df = pd.read_csv(archivo_temporal)
+    finally:
+        # Asegurarse de que el archivo temporal sea eliminado
+        if os.path.exists(archivo_temporal):
+            os.remove(archivo_temporal)
+
+    return df
 
 #Define función que crea las matrices de variación para cada partido
 
@@ -101,8 +119,8 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
             m_variacion.loc[comuna, partido] = max(1,incumbencia.loc[comuna,partido]*incumb,incumbencia_cruzada.loc[comuna,partido]*incumb_cruz) + x
             print(f"    Valor calculado: {m_variacion.loc[comuna, partido]}")
         sum_com=m_variacion.loc[comuna].sum()-len(partidos)
-        if sum_com>1/part.loc[comuna]:
-            ajus=(sum_com-1/part.loc[comuna])/len(partidos)
+        if sum_com>1/part.loc[comuna,'Participacion']:
+            ajus=(sum_com-1/part.loc[comuna, 'Participacion'])/len(partidos)
             for j, partido in enumerate(partidos):
                 m_variacion.loc[comuna, partido]-=ajus
     print("\nMatriz final generada:")
@@ -153,9 +171,12 @@ url_cores = r"https://drive.google.com/uc?id=1U2KgH6EFu-Jbcm3c6t27x7UXvl7Lovzc"
 url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
 url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
 url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
-url_incumbencia=r"https://drive.google.com/uc?id=1SBubs9hr9gc9uGMDD_48GpLuiWDstQq3gLH004Vprv8"
-url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1KIxSnxQIJkBOZ4ojxo7Ux6pekKFx4t2veGG2DLok53g"
+url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
+url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
+
+
+
 
 concejales=leer_excel_desde_drive(url_concejales)
 cores= leer_excel_desde_drive(url_cores)
@@ -174,14 +195,6 @@ participacion.set_index('Comuna', inplace=True)
 
 
 
-
-#ruta_concejales = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\concejales2024_definitivo.xlsx"
-#ruta_cores = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\cores2024_definitivo.xlsx"
-#ruta_partidos=r""
-#ruta_comunas=r""
-#Crear dataframes
-#concejales=pd.read_excel(ruta_concejales)
-#cores=pd.read_excel(ruta_cores)
 
 #CORES
 # Convertir la columna "partido" en una lista
@@ -258,12 +271,26 @@ for comuna in comunas_cores:
     promedio_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(100)], axis=1).mean(axis=1)
     mediana_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(100)], axis=1).median(axis=1)
 
+# Truncar los valores en los DataFrames de promedios y medianas
+promedio_concejales = promedio_concejales.applymap(lambda x: np.trunc(x))
+mediana_concejales = mediana_concejales.applymap(lambda x: np.trunc(x))
+promedio_cores = promedio_cores.applymap(lambda x: np.trunc(x))
+mediana_cores = mediana_cores.applymap(lambda x: np.trunc(x))
+
+# Truncar los resultados proyectados después de la división
+resultados_proyectados = (promedio_cores + promedio_concejales) / 2
+resultados_proyectados = resultados_proyectados.applymap(lambda x: np.trunc(x))
+
 #A partir del promedio de cores y concejales se calcular un valor único de votos para cada comuna y partido
 
 
 #Luego de obtenidos los resultados se deben obtener los votos por distrito y circunscripcion para cada partido
 # Calculamos el promedio de ambos DataFrames para cada celda
-resultados_proyectados = (promedio_cores + promedio_concejales) / 2
+resultados_proyectados=(promedio_cores + promedio_concejales) / 2
+resultados_proyectados=resultados_proyectados.fillna(0)
+resultados_proyectados = np.trunc(resultados_proyectados).astype(int)
+
+
 
 #Se calculan los votos de cada partido por distriro
 # Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice
@@ -290,6 +317,7 @@ resultados_proyectados_transpuesto = resultados_proyectados_distrito.T
 resultados_proyectados_transpuesto = resultados_proyectados_transpuesto.merge(pactos, how='left', left_index=True, right_on='partido')
 # Paso 3: Agrupar por 'pacto' y sumar los votos de los partidos dentro de cada pacto
 resultados_proyectados_por_pacto = resultados_proyectados_transpuesto.groupby('pacto').sum()
+resultados_proyectados_por_partido = resultados_proyectados_transpuesto.groupby(['pacto','partido']).sum()
 # Paso 4: Volver a transponer para tener las comunas como índice y los pactos como columnas
 resultados_proyectados_por_pacto = resultados_proyectados_por_pacto.T
 resultados_proyectados_por_pacto = resultados_proyectados_por_pacto.drop("partido", axis=0)
@@ -297,7 +325,9 @@ resultados_proyectados_por_pacto = resultados_proyectados_por_pacto.drop("partid
 
 # Crear DataFrame para guardar los resultados, usando pactos como columnas
 pactos_unicos = resultados_proyectados_por_pacto.columns  # Extraer los pactos únicos
+partidos_unicos = resultados_proyectados_distrito.columns
 integracion_pacto = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=pactos_unicos)
+integracion_partido = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=partidos_unicos)
 
 # Asegurarse de que la columna 'Distrito' sea el índice de 'escaños'
 escaños = escaños.set_index('Distrito')
@@ -318,3 +348,20 @@ for d in resultados_proyectados_distrito.index:
     pactos_no_cero = fila[fila != 0].index  # Índices (pactos) con votos
     for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
         integracion_pacto.loc[d, pacto] = escaños_asignados
+    for indice, row in integracion_pacto.iterrows():
+        for pacto in pactos_unicos:
+            n_electos=row[pacto]
+            partidos=pactos.loc[pactos['pactos']==pacto,'partido'].tolist()
+            n_partidos=len(partidos)
+            votos_partido=resultados_proyectados_distrito.loc[indice,partidos].tolist()
+            integracion_partidos=calcula_dhont(n_electos, n_partidos, votos_partido)
+            for partido, escaños_partido in zip(partidos,integracion_partidos):
+                integracion_partido.loc[d,partido] = escaños_partido
+                            
+
+
+resultados_proyectados_distrito.to_csv("resultados_proyectados_distrito.csv", encoding= 'utf-8',sep=';')
+resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
+integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
+integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
+#integracion_partido.csv("resultados_url_integracion_partido.csv", encoding= 'utf-8',sep=';')
