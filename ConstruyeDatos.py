@@ -90,7 +90,12 @@ df_filtrado['partido'] = df_filtrado.apply(
     axis=1
 )
 
-ruta_salida = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\cores2024.csv"
+df_filtrado = df_filtrado.groupby(['comuna','partido']).agg({
+    'votos': 'sum',
+    'region': 'first',
+    })
+
+ruta_salida = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\cores2024_definitivo.csv"
 df_filtrado.to_csv(ruta_salida, index=True, encoding='utf-8-sig')
 
 
@@ -165,7 +170,11 @@ df_2_filtrado['partido'] = df_2_filtrado.apply(
     axis=1
 )
 
-ruta_salida = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\concejales2024.csv"
+df_2_filtrado = df_2_filtrado.groupby(['comuna','partido']).agg({
+    'votos': 'sum',
+    'region': 'first',
+    })
+ruta_salida = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\concejales2024_definitivo.csv"
 df_2_filtrado.to_csv(ruta_salida, index=True, encoding='utf-8-sig')
 
 
