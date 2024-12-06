@@ -101,8 +101,8 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
             m_variacion.loc[comuna, partido] = max(1,incumbencia.loc[comuna,partido]*incumb,incumbencia_cruzada.loc[comuna,partido]*incumb_cruz) + x
             print(f"    Valor calculado: {m_variacion.loc[comuna, partido]}")
         sum_com=m_variacion.loc[comuna].sum()-len(partidos)
-        if sum_com>1/part.loc[comuna]:
-            ajus=(sum_com-1/part.loc[comuna])/len(partidos)
+        if sum_com>1/part.loc[comuna,'Participacion']:
+            ajus=(sum_com-1/part.loc[comuna, 'Participacion'])/len(partidos)
             for j, partido in enumerate(partidos):
                 m_variacion.loc[comuna, partido]-=ajus
     print("\nMatriz final generada:")
@@ -329,6 +329,6 @@ for d in resultados_proyectados_distrito.index:
     for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
         integracion_pacto.loc[d, pacto] = escaños_asignados
 
-resultados_proyectados_distrito.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_distrito.csv")
-resultados_proyectados_por_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_por_pacto.csv")
-integracion_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\integracion_pacto.csv")
+resultados_proyectados_distrito.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_distrito.xlsx")
+resultados_proyectados_por_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_por_pacto.xlsx")
+integracion_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\integracion_pacto.xlsx")
