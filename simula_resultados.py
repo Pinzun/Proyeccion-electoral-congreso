@@ -153,8 +153,8 @@ url_cores = r"https://drive.google.com/uc?id=1U2KgH6EFu-Jbcm3c6t27x7UXvl7Lovzc"
 url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
 url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
 url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
-url_incumbencia=r"https://drive.google.com/uc?id=1SBubs9hr9gc9uGMDD_48GpLuiWDstQq3gLH004Vprv8"
-url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1KIxSnxQIJkBOZ4ojxo7Ux6pekKFx4t2veGG2DLok53g"
+url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
+url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
 
 concejales=leer_excel_desde_drive(url_concejales)
@@ -258,6 +258,16 @@ for comuna in comunas_cores:
     promedio_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(100)], axis=1).mean(axis=1)
     mediana_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(100)], axis=1).median(axis=1)
 
+# Truncar los valores en los DataFrames de promedios y medianas
+promedio_concejales = promedio_concejales.applymap(lambda x: np.trunc(x))
+mediana_concejales = mediana_concejales.applymap(lambda x: np.trunc(x))
+promedio_cores = promedio_cores.applymap(lambda x: np.trunc(x))
+mediana_cores = mediana_cores.applymap(lambda x: np.trunc(x))
+
+# Truncar los resultados proyectados después de la división
+resultados_proyectados = (promedio_cores + promedio_concejales) / 2
+resultados_proyectados = resultados_proyectados.applymap(lambda x: np.trunc(x))
+
 #A partir del promedio de cores y concejales se calcular un valor único de votos para cada comuna y partido
 
 
@@ -318,3 +328,7 @@ for d in resultados_proyectados_distrito.index:
     pactos_no_cero = fila[fila != 0].index  # Índices (pactos) con votos
     for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
         integracion_pacto.loc[d, pacto] = escaños_asignados
+
+resultados_proyectados_distrito.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_distrito.csv")
+resultados_proyectados_por_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_por_pacto.csv")
+integracion_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\integracion_pacto.csv")
