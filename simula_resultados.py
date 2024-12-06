@@ -59,37 +59,52 @@ def leer_excel_desde_drive(url):
 
 #Define función que crea las matrices de variación para cada partido
 
-def matriz_votos(partidos, comunas, variacion, iteracion, eleccion):
+def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion, iteracion, eleccion, part):
     """Genera una matriz de votos por partido y comuna basada en una combinación
     lineal de un factor constante y una variación pseudoaleatoria.
 
     Args:
-    - partidos (list): Lista de nombres de partidos (columnas).
+    - partidos (df): Lista de nombres de partidos (columnas).
     - comunas (list): Lista de nombres de comunas (filas).
+    - incumbencia (df): matriz de dimensiones comunas x partidos con 0 y 1 que indica si un partido tiene incumbencia o no.
+    - incumbencia_cruzada (df): matriz de dimensiones comunas x partidos con 0 y 1 que indica si un partido tiene incumbencia cruzada o no.
     - variacion (float): Valor máximo de la variación aleatoria permitida (entre -variacion y +variacion).
-
+    - part (df): matriz con la participacion de cada comuna 
     Returns:
     - pd.DataFrame: Matriz de votos con índices como comunas y columnas como partidos.
     """
     # Límites para la variación aleatoria
     variacion_max = variacion
-    variacion_min = -variacion   
+    variacion_min = -variacion
+    print(f"Límites de variación: {variacion_min} a {variacion_max}")
 
     # Definir un factor constante
-    incumbencia = 0.3     
+    incumb = 1.078  
+    print(f"Factor constante (incumbencia): {incumb}")
+    # Definir un factor constante
+    incumb_cruz = 1.094  
+    print(f"Factor constante (incumbencia_cruzada): {incumb_cruz}")
 
     # Crear la matriz de votos
-    m_variacion = pd.DataFrame(index=comunas, columns=partidos)   
-
+    m_variacion = pd.DataFrame(index=comunas, columns=partidos)
+    m_variacion = m_variacion.fillna(0)
+    print(f"Matriz inicial (vacía):\n{m_variacion}")
     # Rellenar la matriz con los valores calculados
     for i, comuna in enumerate(comunas):
         print(f"\nProcesando comuna {i + 1}/{len(comunas)}: {comuna}")
         for j, partido in enumerate(partidos):
+            print(f"  Procesando partido {j + 1}/{len(partidos)}: {partido}, para la iteración {iteracion} de {eleccion}")
             # Generar un valor pseudoaleatorio dentro del rango especificado
             x = np.random.uniform(variacion_min, variacion_max)
+            print(f"    Variación aleatoria generada: {x}")
             # Calcular el voto como combinación lineal: constante + variación
-            m_variacion.loc[comuna, partido] = incumbencia + x
-
+            m_variacion.loc[comuna, partido] = max(1,incumbencia.loc[comuna,partido]*incumb,incumbencia_cruzada.loc[comuna,partido]*incumb_cruz) + x
+            print(f"    Valor calculado: {m_variacion.loc[comuna, partido]}")
+        sum_com=m_variacion.loc[comuna].sum()-len(partidos)
+        if sum_com>1/part.loc[comuna]:
+            ajus=(sum_com-1/part.loc[comuna])/len(partidos)
+            for j, partido in enumerate(partidos):
+                m_variacion.loc[comuna, partido]-=ajus
     print("\nMatriz final generada:")
     print(m_variacion)
 
@@ -138,12 +153,25 @@ url_cores = r"https://drive.google.com/uc?id=1U2KgH6EFu-Jbcm3c6t27x7UXvl7Lovzc"
 url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
 url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
 url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
+url_incumbencia=r"https://drive.google.com/uc?id=1SBubs9hr9gc9uGMDD_48GpLuiWDstQq3gLH004Vprv8"
+url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1KIxSnxQIJkBOZ4ojxo7Ux6pekKFx4t2veGG2DLok53g"
+url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
 
 concejales=leer_excel_desde_drive(url_concejales)
 cores= leer_excel_desde_drive(url_cores)
 escaños=leer_excel_desde_drive(url_escaños)
 comunas_distrito=leer_excel_desde_drive(url_comunas_distro)
 pactos=leer_excel_desde_drive(url_pactos)
+incumbencia=leer_excel_desde_drive(url_incumbencia)
+# Configurar la columna 'Comuna' como índice
+incumbencia.set_index('Comuna', inplace=True)
+incumbencia_cruzada=leer_excel_desde_drive(url_incumbencia_cruzada)
+# Configurar la columna 'Comuna' como índice
+incumbencia_cruzada.set_index('Comuna', inplace=True)
+participacion=leer_excel_desde_drive(url_participacion)
+# Configurar la columna 'Comuna' como índice
+participacion.set_index('Comuna', inplace=True)
+
 
 
 
@@ -186,7 +214,7 @@ variacion=0.15
 contador=0
 eleccion="concejales"
 while contador <100:    
-    m_variacion=matriz_votos(partidos_concejales, comunas_concejales, variacion, contador, eleccion)    
+    m_variacion=matriz_votos(partidos_concejales, comunas_concejales, incumbencia, incumbencia_cruzada, variacion, contador, eleccion, participacion)    
     resultados_concejales[contador] = concejales_pivot.multiply(m_variacion) 
     resultados_concejales[contador] = resultados_concejales[contador].fillna(0)
     print(f"iteración {contador} de concejales")
@@ -200,7 +228,7 @@ variacion=0.15
 contador=0
 eleccion="cores"
 while contador <100:
-    m_variacion=matriz_votos(partidos_cores, comunas_cores, variacion, contador, eleccion)
+    m_variacion=matriz_votos(partidos_cores, comunas_cores, incumbencia, incumbencia_cruzada, variacion, contador, eleccion, participacion)
     resultados_cores[contador] = cores_pivot.multiply(m_variacion)
     resultados_cores[contador] = resultados_cores[contador].fillna(0)
 
@@ -290,4 +318,3 @@ for d in resultados_proyectados_distrito.index:
     pactos_no_cero = fila[fila != 0].index  # Índices (pactos) con votos
     for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
         integracion_pacto.loc[d, pacto] = escaños_asignados
-
