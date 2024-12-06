@@ -268,7 +268,11 @@ resultados_proyectados = resultados_proyectados.applymap(lambda x: np.trunc(x))
 
 #Luego de obtenidos los resultados se deben obtener los votos por distrito y circunscripcion para cada partido
 # Calculamos el promedio de ambos DataFrames para cada celda
-resultados_proyectados = (promedio_cores + promedio_concejales) / 2
+resultados_proyectados=(promedio_cores + promedio_concejales) / 2
+resultados_proyectados=resultados_proyectados.fillna(0)
+resultados_proyectados = np.trunc(resultados_proyectados).astype(int)
+
+
 
 #Se calculan los votos de cada partido por distriro
 # Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice
@@ -326,9 +330,7 @@ for d in resultados_proyectados_distrito.index:
 
 
 
-
-
-resultados_proyectados_distrito.to_csv("resultados_proyectados_distrito.csv",index=False, encoding= 'utf-8',sep=';')
-resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv",index=False, encoding= 'utf-8',sep=';')
-integracion_pacto.to_csv("resultados_url_integracion_pacto.csv",index=False, encoding= 'utf-8',sep=';')
-#integracion_partido.csv("resultados_url_integracion_partido.csv",index=False, encoding= 'utf-8',sep=';')
+resultados_proyectados_distrito.to_csv("resultados_proyectados_distrito.csv", encoding= 'utf-8',sep=';')
+resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
+integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8',sep=';')
+#integracion_partido.csv("resultados_url_integracion_partido.csv", encoding= 'utf-8',sep=';')
