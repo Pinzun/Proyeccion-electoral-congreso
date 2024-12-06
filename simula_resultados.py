@@ -156,11 +156,6 @@ url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
 url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
 url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
-#url_resultados_proyectados_distrito=
-#url_resultados_proyectados_por_pacto=
-#resultados_url_integracion_pacto=
-
-
 
 
 
@@ -329,6 +324,11 @@ for d in resultados_proyectados_distrito.index:
     for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
         integracion_pacto.loc[d, pacto] = escaños_asignados
 
-resultados_proyectados_distrito.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_distrito.xlsx")
-resultados_proyectados_por_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\resultados_proyectados_por_pacto.xlsx")
-integracion_pacto.to_excel(r"C:\Users\pablo\OneDrive\Escritorio\integracion_pacto.xlsx")
+
+
+
+
+resultados_proyectados_distrito.to_csv("resultados_proyectados_distrito.csv",index=False, encoding= 'utf-8',sep=';')
+resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv",index=False, encoding= 'utf-8',sep=';')
+integracion_pacto.to_csv("resultados_url_integracion_pacto.csv",index=False, encoding= 'utf-8',sep=';')
+#integracion_partido.csv("resultados_url_integracion_partido.csv",index=False, encoding= 'utf-8',sep=';')
