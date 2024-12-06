@@ -156,6 +156,14 @@ url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
 url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
 url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
+#url_resultados_proyectados_distrito=
+#url_resultados_proyectados_por_pacto=
+#resultados_url_integracion_pacto=
+
+
+
+
+
 
 concejales=leer_excel_desde_drive(url_concejales)
 cores= leer_excel_desde_drive(url_cores)
@@ -174,14 +182,6 @@ participacion.set_index('Comuna', inplace=True)
 
 
 
-
-#ruta_concejales = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\concejales2024_definitivo.xlsx"
-#ruta_cores = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\cores2024_definitivo.xlsx"
-#ruta_partidos=r""
-#ruta_comunas=r""
-#Crear dataframes
-#concejales=pd.read_excel(ruta_concejales)
-#cores=pd.read_excel(ruta_cores)
 
 #CORES
 # Convertir la columna "partido" en una lista
