@@ -9,51 +9,95 @@ Created on Sun Nov 24 17:49:52 2024
 import pandas as pd
 
 # Rutas de los archivos
-ruta_cores2024 = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\cores_servel_comunas_nacional.xlsx"
+ruta_cores2024 = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\cores_servel_comunas_nacional.xlsx"
 
 # Cargar los datos
-cores2024 = pd.read_excel(ruta_cores2024)
+df = pd.read_excel(ruta_cores2024)
 
 # Filtrar los datos según condiciones específicas
-condicion = (
-    cores2024["candidato"].str.match(r"^[a-zA-Z]", na=False) & 
-    ~cores2024["candidato"].isin(["Votos nulos", "Votos blancos"])
-)
+#condicion = (
+#    cores2024["candidato"].str.match(r"^[a-zA-Z]", na=False) & 
+#    ~cores2024["candidato"].isin(["Votos nulos", "Votos blancos"])
+#)
 
-cores2024_filtrado = cores2024.copy()  # Crear una copia para manipulación
+# Crear una copia del DataFrame para trabajar
+df_filtrado = df.copy()
+# Variable para guardar el partido válido más cercano
+ultimo_partido_valido = None
 
-# Actualizar columna 'partido' con valores de la siguiente fila si cumplen la condición
-for index in cores2024_filtrado[condicion].index:
-    if index + 1 < len(cores2024_filtrado):  # Validar existencia de fila posterior
-        cores2024_filtrado.loc[index, "partido"] = cores2024_filtrado.loc[index + 1, "partido"]
+# Lógica para procesar la columna 'partido'
+for index in df_filtrado.index:
+    candidato = df_filtrado.at[index, 'candidato']
+    partido = df_filtrado.at[index, 'partido']
+    aux = df_filtrado.at[index, 'aux']
+    
+    # Si el partido está vacío pero es "Votos Nulos" o "Votos Blancos"
+    if pd.isna(partido) and candidato in ["Votos Nulos", "Votos Blancos"]:
+        df_filtrado.at[index, 'partido'] = candidato   
+    
+    # Si el partido es válido y no es "IND", actualizar el último partido válido
+    elif pd.notna(aux) and pd.isna(partido):
+        ultimo_partido_valido = aux
+    
+    # Si el partido es "IND", usar el último partido válido
+    elif partido == "IND":
+        if ultimo_partido_valido:
+            df_filtrado.at[index, 'partido'] = f"IND - {ultimo_partido_valido}"
+        else:
+            # Si no hay un partido válido previo, mantener como "IND"
+            df_filtrado.at[index, 'partido'] = "IND"
+            
+# Eliminar filas con partido vacío al final
+df_filtrado = df_filtrado.dropna(subset=['partido'])
 
-# Convertir y limpiar datos de la columna 'votos'
-#cores2024_filtrado['votos'] = cores2024_filtrado['votos'].astype(str)
-#cores2024_filtrado['votos'] = cores2024_filtrado['votos'].str.replace('.', '', regex=False).astype(int)
-
-# Rellenar la columna 'partido' con valores específicos
-cores2024_filtrado.loc[cores2024_filtrado['candidato'] == 'Votos Nulos', 'partido'] = 'Votos Nulos'
-cores2024_filtrado.loc[cores2024_filtrado['candidato'] == 'Votos Blancos', 'partido'] = 'Votos blancos'
-
-#Borrar elementos que tengan partido nan
-cores2024_filtrado = cores2024_filtrado.dropna(subset=['partido'])
-#Borrar candidatos y dejar solo totales de subpactos
-cores2024_filtrado = cores2024_filtrado[~cores2024_filtrado['candidato'].str.match(r'^\d', na=False)]
-
+# Reiniciar índices después del filtrado
+df_filtrado.reset_index(drop=True, inplace=True)# Reiniciar índices después del filtrado
+#df_filtrado.reset_index(drop=True, inplace=True)
 
 #Se asumen que todos los votos del partido POPULAR son de PH
 
 #['partido'] = cores2024_filtrado['partido'].replace("POPULAR", "PH")
 #cores2024_filtrado.loc[cores2024_filtrado['candidato'] == "B - IZQUIERDA ECOLOGISTA POPULAR", 'partido'] = "PH"
 
-# Reemplazar "IND" en 'partido' por "IND" concatenado con el valor de 'candidato'
-cores2024_filtrado['partido'] = cores2024_filtrado.apply(
-    lambda row: f"IND - {row['candidato']}" if row['partido'] == "IND" else row['partido'],
+#PL=['DE ARICA Y PARINACOTA','DE TARAPACA','DE ANTOFAGASTA','DE VALPARAISO','METROPOLITANA DE SANTIAGO','DE ÑUBLE','DEL BIOBIO','DE LA ARAUCANIA','DE LOS LAGOS']
+#FREVS=['DE ARICA Y PARINACOTA','DE TARAPACA','DE ANTOFAGASTA','DE ATACAMA','DE COQUIMBO','DE VALPARAISO','METROPOLITANA DE SANTIAGO',"DEL LIBERTADOR GENERAL BERNARDO O'HIGGINS",'DEL MAULE','DE ÑUBLE','DEL BIOBIO','DE LA ARAUCANIA','DE LOS RIOS','DE LOS LAGOS','DE AYSEN DEL GENERAL CARLOS IBAÑEZ DEL CAMPO']
+
+
+
+# Reemplazar "IND - FREVS" en 'partido' por "IND - FREVS/PL y similares"
+df_filtrado['partido'] = df_filtrado.apply(
+    lambda row: "IND - FREVS/PL" if row['partido'] == "IND - FREVS" else row['partido'],
     axis=1
 )
 
-ruta_salida = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\cores2024_f_preeliminar.xlsx"
-cores2024_filtrado.to_excel(ruta_salida, index=True)
+
+df_filtrado['partido'] = df_filtrado.apply(
+    lambda row: "IND - FREVS/PL" if row['partido'] == "IND - PL" else row['partido'],
+    axis=1
+)
+
+df_filtrado['partido'] = df_filtrado.apply(
+    lambda row: "IND - POPULAR/PH/IGUALDAD" if row['partido'] == "IND - POPULAR" else row['partido'],
+    axis=1
+)
+
+df_filtrado['partido'] = df_filtrado.apply(
+    lambda row: "IND - POPULAR/PH/IGUALDAD" if row['partido'] == "IND - PH" else row['partido'],
+    axis=1
+)
+
+df_filtrado['partido'] = df_filtrado.apply(
+    lambda row: "IND - POPULAR/PH/IGUALDAD" if row['partido'] == "IND - IGUALDAD" else row['partido'],
+    axis=1
+)
+
+df_filtrado = df_filtrado.groupby(['comuna','partido']).agg({
+    'votos': 'sum',
+    'region': 'first',
+    })
+
+ruta_salida = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\cores2024_definitivo.csv"
+df_filtrado.to_csv(ruta_salida, index=True, encoding='utf-8-sig')
 
 
 
@@ -63,54 +107,79 @@ cores2024_filtrado.to_excel(ruta_salida, index=True)
 #Repite la operación para concejales
 import pandas as pd
 #cargar los datos
-ruta_concejales2024 = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\concejales_servel_comunas_nacional.xlsx"
+ruta_concejales2024 = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\concejales_servel_comunas_nacional.xlsx"
 # Cargar los datos
-concejales2024 = pd.read_excel(ruta_concejales2024)
-
-# Filtrar los datos según condiciones específicas
-condicion = (
-    concejales2024["candidato"].str.match(r"^[a-zA-Z]", na=False) & 
-    ~concejales2024["candidato"].isin(["Votos nulos", "Votos blancos"])
-)
-
-concejales2024_filtrado = concejales2024.copy()  # Crear una copia para manipulación
-
-# Actualizar columna 'partido' con valores de la siguiente fila si cumplen la condición
-for index in concejales2024_filtrado[condicion].index:
-    if index + 1 < len(concejales2024_filtrado):  # Validar existencia de fila posterior
-        concejales2024_filtrado.loc[index, "partido"] = concejales2024_filtrado.loc[index + 1, "partido"]
-
-# Rellenar la columna 'partido' con valores específicos
-concejales2024_filtrado.loc[concejales2024_filtrado['candidato'] == 'Votos Nulos', 'partido'] = 'Votos Nulos'
-concejales2024_filtrado.loc[concejales2024_filtrado['candidato'] == 'Votos Blancos', 'partido'] = 'Votos blancos'
-
-#Borrar elementos que tengan partido nan
-concejales2024_filtrado = concejales2024_filtrado.dropna(subset=['partido'])
-#Borrar candidatos y dejar solo totales de subpactos
-concejales2024_filtrado = concejales2024_filtrado[~concejales2024_filtrado['candidato'].str.match(r'^\d', na=False)]
+df_2 = pd.read_excel(ruta_concejales2024)
 
 
-#Se asumen que todos los votos del partido POPULAR son de PH
+df_2_filtrado = df_2.copy()  # Crear una copia para manipulación
 
-#['partido'] = cores2024_filtrado['partido'].replace("POPULAR", "PH")
-#cores2024_filtrado.loc[cores2024_filtrado['candidato'] == "B - IZQUIERDA ECOLOGISTA POPULAR", 'partido'] = "PH"
+# Variable para guardar el partido válido más cercano
+ultimo_partido_valido = None
 
-# Reemplazar "IND" en 'partido' por "IND" concatenado con el valor de 'candidato'
-concejales2024_filtrado['partido'] = concejales2024_filtrado.apply(
-    lambda row: f"IND - {row['candidato']}" if row['partido'] == "IND" else row['partido'],
+# Lógica para procesar la columna 'partido'
+for index in df_2_filtrado.index:
+    candidato = df_2_filtrado.at[index, 'candidato']
+    partido = df_2_filtrado.at[index, 'partido']
+    aux = df_2_filtrado.at[index, 'aux']
+    
+    # Si el partido está vacío pero es "Votos Nulos" o "Votos Blancos"
+    if pd.isna(partido) and candidato in ["Votos Nulos", "Votos Blancos"]:
+        df_2_filtrado.at[index, 'partido'] = candidato
+
+    # Si el partido es válido y no es "IND", actualizar el último partido válido
+    elif pd.notna(aux) and pd.isna(partido):
+        ultimo_partido_valido = aux
+    
+    
+    # Si el partido es "IND", usar el último partido válido
+    elif partido == "IND":
+        if ultimo_partido_valido:
+            df_2_filtrado.at[index, 'partido'] = f"IND - {ultimo_partido_valido}"
+        else:
+            # Si no hay un partido válido previo, mantener como "IND"
+            df_2_filtrado.at[index, 'partido'] = "IND"
+            
+# Eliminar filas con partido vacío al final
+df_2_filtrado = df_2_filtrado.dropna(subset=['partido'])
+
+# Reiniciar índices después del filtrado
+df_2_filtrado.reset_index(drop=True, inplace=True)# Reiniciar índices después del filtrado
+
+# Reemplazar "IND - FREVS" en 'partido' por "IND - FREVS/PL"
+df_2_filtrado['partido'] = df_2_filtrado.apply(
+    lambda row: "IND - FREVS/PL" if row['partido'] == "IND - FREVS" else row['partido'],
     axis=1
 )
 
-ruta_salida = r"C:\Users\pablo\OneDrive\Escritorio\Proyeccion electoral congreso\concejales2024_f_preeliminar.xlsx"
-concejales2024_filtrado.to_excel(ruta_salida, index=True)
+# Reemplazar "IND - FREVS" en 'partido' por "IND - FREVS/PL"
+df_2_filtrado['partido'] = df_2_filtrado.apply(
+    lambda row: "IND - FREVS/PL" if row['partido'] == "IND - PL" else row['partido'],
+    axis=1
+)
+
+df_2_filtrado['partido'] = df_2_filtrado.apply(
+    lambda row: "IND - POPULAR/PH/IGUALDAD" if row['partido'] == "IND - POPULAR" else row['partido'],
+    axis=1
+)
+
+df_filtrado['partido'] = df_2_filtrado.apply(
+    lambda row: "IND - POPULAR/PH/IGUALDAD" if row['partido'] == "IND - PH" else row['partido'],
+    axis=1
+)
+
+df_2_filtrado['partido'] = df_2_filtrado.apply(
+    lambda row: "IND - POPULAR/PH/IGUALDAD" if row['partido'] == "IND - IGUALDAD" else row['partido'],
+    axis=1
+)
+
+df_2_filtrado = df_2_filtrado.groupby(['comuna','partido']).agg({
+    'votos': 'sum',
+    'region': 'first',
+    })
+ruta_salida = r"C:\Users\Ivan\OneDrive\Asesorias varias-PCIvan\Datos electorales\EstrategiaSur\Scrapeos\concejales2024_definitivo.csv"
+df_2_filtrado.to_csv(ruta_salida, index=True, encoding='utf-8-sig')
 
 
 
 #DESDE AQUI COMIENZA OTRO CÓDIGO, DESCOMENTAR PARA USAR
-
-
-
-
-
-
-
