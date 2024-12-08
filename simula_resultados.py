@@ -336,8 +336,9 @@ resultados_proyectados_por_pacto = resultados_proyectados_por_pacto.drop("partid
 pactos_unicos = resultados_proyectados_por_pacto.columns  # Extraer los pactos únicos
 partidos_unicos = resultados_proyectados_distrito.columns
 integracion_pacto = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=pactos_unicos)
+integracion_pacto=integracion_pacto.fillna(0)
 integracion_partido = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=partidos_unicos)
-
+integracion_partido=integracion_partido.fillna(0)
 # Asegurarse de que la columna 'Distrito' sea el índice de 'escaños'
 escaños = escaños.set_index('Distrito')
 
@@ -357,15 +358,15 @@ for d in resultados_proyectados_distrito.index:
     pactos_no_cero = fila[fila != 0].index  # Índices (pactos) con votos
     for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
         integracion_pacto.loc[d, pacto] = escaños_asignados
-    for indice, row in integracion_pacto.iterrows():
-        for pacto in pactos_unicos:
-            n_electos=row[pacto]
-            partidos=pactos.loc[pactos['pacto']==pacto,'partido'].tolist()
-            n_partidos=len(partidos)
-            votos_partido=resultados_proyectados_distrito.loc[indice,partidos].tolist()
-            integracion_partidos=calcula_dhont(n_electos, n_partidos, votos_partido)
-            for partido, escaños_partido in zip(partidos,integracion_partidos):
-                integracion_partido.loc[d,partido] = escaños_partido
+for indice, row in integracion_pacto.iterrows():
+    for pacto in pactos_unicos:
+        n_electos=row[pacto]
+        partidos=pactos.loc[pactos['pacto']==pacto,'partido'].tolist()
+        n_partidos=len(partidos)
+        votos_partido=resultados_proyectados_distrito.loc[indice,partidos].tolist()
+        integracion_partidos=calcula_dhont(n_electos, n_partidos, votos_partido)
+        for partido, escaños_partido in zip(partidos,integracion_partidos):
+            integracion_partido.loc[indice,partido] = escaños_partido
                             
 
 
