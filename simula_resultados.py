@@ -224,7 +224,7 @@ resultados_concejales = {} # El resultado de concejales es un diccionario que al
 variacion=0.15
 contador=0
 eleccion="concejales"
-while contador <100: 
+while contador <10: 
 #while contador <100:    
     m_variacion=matriz_votos(partidos_concejales, comunas_concejales, incumbencia, incumbencia_cruzada, variacion, contador, eleccion, participacion)    
     resultados_concejales[contador] = concejales_pivot.multiply(m_variacion) 
@@ -239,7 +239,7 @@ resultados_cores= {} # El resultado de cores es un diccionario que almaneca mult
 variacion=0.15
 contador=0
 eleccion="cores"
-while contador <100:
+while contador <10:
     m_variacion=matriz_votos(partidos_cores, comunas_cores, incumbencia, incumbencia_cruzada, variacion, contador, eleccion, participacion)
     resultados_cores[contador] = cores_pivot.multiply(m_variacion)
     resultados_cores[contador] = resultados_cores[contador].fillna(0)
@@ -259,8 +259,8 @@ media_concejales = pd.DataFrame()
 mediana_concejales = pd.DataFrame()
 
 for comuna in comunas_concejales:    
-    promedio_concejales[comuna] = pd.concat([resultados_concejales[i].loc[comuna] for i in range(100)], axis=1).mean(axis=1)
-    mediana_concejales[comuna] = pd.concat([resultados_concejales[i].loc[comuna] for i in range(100)], axis=1).median(axis=1)
+    promedio_concejales[comuna] = pd.concat([resultados_concejales[i].loc[comuna] for i in range(10)], axis=1).mean(axis=1)
+    mediana_concejales[comuna] = pd.concat([resultados_concejales[i].loc[comuna] for i in range(10)], axis=1).median(axis=1)
 
 
 # Calcular los promedios, medias y medianas para los resultados de cores para cada comuna y partido
@@ -268,8 +268,8 @@ promedio_cores = pd.DataFrame()
 mediana_cores = pd.DataFrame()
 
 for comuna in comunas_cores:    
-    promedio_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(100)], axis=1).mean(axis=1)
-    mediana_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(100)], axis=1).median(axis=1)
+    promedio_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(10)], axis=1).mean(axis=1)
+    mediana_cores[comuna] = pd.concat([resultados_cores[i].loc[comuna] for i in range(10)], axis=1).median(axis=1)
 # Truncar los valores en los DataFrames de promedios y medianas
 promedio_concejales = promedio_concejales.applymap(lambda x: np.trunc(x))
 mediana_concejales = mediana_concejales.applymap(lambda x: np.trunc(x))
