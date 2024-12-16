@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
 
-ruta1=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_distrito_v1.csv"
-ruta2=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_distrito_v2.csv"
-ruta3=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_distrito_v3.csv"
-ruta4=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_distrito_v4.csv"
-ruta5=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_distrito_v5.csv"
+ruta1=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_por_pacto_v1.csv"
+ruta2=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_por_pacto_v2.csv"
+ruta3=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_por_pacto_v3.csv"
+ruta4=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_por_pacto_v4.csv"
+ruta5=r"C:\Users\Ivan\Desktop\Ivan\Laboral\EstrategiaSur\Trabajo Bancada\resultados_proyectados_por_pacto_v5.csv"
 
 df1=pd.read_csv(ruta1, sep=';', encoding='utf-8-sig')
 df2=pd.read_csv(ruta2, sep=';', encoding='utf-8-sig')
