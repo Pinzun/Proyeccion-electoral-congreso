@@ -84,8 +84,8 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
     Args:
     - partidos (df): Lista de nombres de partidos (columnas).
     - comunas (list): Lista de nombres de comunas (filas).
-    - incumbencia (df): matriz de dimensiones comunas x partidos con 0 y 1 que indica si un partido tiene incumbencia o no.
-    - incumbencia_cruzada (df): matriz de dimensiones comunas x partidos con 0 y 1 que indica si un partido tiene incumbencia cruzada o no.
+    - incumbencia (df): matriz de dimensiones comunas x partidos que indica la cantidad de incumbencias de un partido.
+    - incumbencia_cruzada (df): matriz de dimensiones comunas x que indica la cantidad de incumbencias cruzadas de un partido.
     - variacion (float): Valor máximo de la variación aleatoria permitida (entre -variacion y +variacion).
     - part (df): matriz con la participacion de cada comuna 
     Returns:
@@ -128,38 +128,6 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
 
     return m_variacion
 
-
-
-#Luego de definida la función se define la función d'hont para calcular los escaños obtenidos por 
-#cada partido
-#Define funcion d'hont
-def calcula_dhont(numero_concejales, numero_pactos, votos_por_pacto):
-    # Crear una lista para almacenar los resultados de la distribución de escaños por pacto
-    escaños_por_pacto = []
-    
-    # Inicializar una lista con el número de escaños ganados por cada pacto a cero
-    for _ in range(numero_pactos):
-        escaños_por_pacto.append(0)
-    
-    # Iterar para asignar los escaños a cada pacto
-    for i in range(numero_concejales):
-        # Crear una lista para almacenar los cocientes electorales
-        cocientes_electorales = []
-        
-        # Calcular el cociente electoral para cada pacto
-        for j in range(numero_pactos):
-            cociente = votos_por_pacto[j] / (escaños_por_pacto[j] + 1)
-            cocientes_electorales.append((cociente, j))
-        
-        # Encontrar el pacto con el mayor cociente electoral
-        max_cociente, index_pacto_ganador = max(cocientes_electorales)
-        
-        # Incrementar el número de escaños del pacto ganador
-        escaños_por_pacto[index_pacto_ganador] += 1
-    
-    return escaños_por_pacto
-
-
 """Luego de definidas las funciones, se deben simular los escenarios
 se simularán 100 escenarios para cada caso, luego se gráficaran para visualizar
 la distribución de los datos y se calcularán estadísticos representativos.
@@ -170,7 +138,7 @@ url_concejales= "https://drive.google.com/uc?id=1IjIMMccD2PBs45YrS4XGQxF-IJrQziI
 url_cores = r"https://drive.google.com/uc?id=1U2KgH6EFu-Jbcm3c6t27x7UXvl7Lovzc"
 url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
 url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
-url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
+url_pactos=r"https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6"
 url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
 url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
@@ -288,80 +256,45 @@ resultados_proyectados = resultados_proyectados.applymap(lambda x: np.trunc(x))
 resultados_proyectados=(promedio_cores + promedio_concejales) / 2
 resultados_proyectados=resultados_proyectados.fillna(0)
 resultados_proyectados = np.trunc(resultados_proyectados).astype(int)
-
-
-
-#Se calculan los votos de cada partido por distriro
-# Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice
-comunas_distrito = comunas_distrito.set_index('comuna')
-
 # Paso 1: Transponer el DataFrame 'resultados_proyectados' para que las comunas sean el índice
-resultados_proyectados_transpuesto = resultados_proyectados.T
+resultados_proyectados = resultados_proyectados.T
+# Combinar las columnas de cada partido con su independiente asociado
+# Aplica un castigo del 20% a los independientes antes de sumarlos al partido principal
 
-# Paso 2: Ahora unimos 'resultados_proyectados_transpuesto' con la columna 'Distrito' de 'comunas_distrito'
-resultados_proyectados_transpuesto['Distrito'] = resultados_proyectados_transpuesto.index.map(comunas_distrito['Distrito'])
+# Filtrar las columnas de independientes asociados (que contienen "IND -") pero excluir "IND - CANDIDATURAS INDEPENDIENTES"
+independientes_asociados = [
+    col for col in resultados_proyectados.columns
+    if col.startswith("IND -") and col != "IND - CANDIDATURAS INDEPENDIENTES"
+]
 
-# Paso 3: Agrupar por 'Distrito' y sumar los votos de cada partido
-resultados_proyectados_distrito = resultados_proyectados_transpuesto.groupby('Distrito').sum()
-resultados_proyectados_distrito.index = resultados_proyectados_distrito.index.astype(int)
+# Manejo de casos especiales donde los votos deben distribuirse en partes iguales
+casos_especiales = {
+    "IND - FREVS/PL": ["FREVS", "PL"],
+    "IND - POPULAR/PH/IGUALDAD": ["POPULAR", "PH", "IGUALDAD"]
+}
 
-
-#se procede a calcular el dhont para diputados
-
- 
-#Se agrupan los votos por pacto
-# Paso 1: Transponer el DataFrame 'resultados_proyectados_distrito' para que los partidos sean las filas
-resultados_proyectados_transpuesto = resultados_proyectados_distrito.T
-# Paso 2: Unir el DataFrame 'resultados_proyectados_transpuesto' con el DataFrame 'pactos' para agregar la columna 'pacto'
-resultados_proyectados_transpuesto = resultados_proyectados_transpuesto.merge(pactos, how='left', left_index=True, right_on='partido')
-# Paso 3: Agrupar por 'pacto' y sumar los votos de los partidos dentro de cada pacto
-resultados_proyectados_por_pacto = resultados_proyectados_transpuesto.groupby('pacto').sum()
-resultados_proyectados_por_partido = resultados_proyectados_transpuesto.groupby(['pacto','partido']).sum()
-# Paso 4: Volver a transponer para tener las comunas como índice y los pactos como columnas
-resultados_proyectados_por_pacto = resultados_proyectados_por_pacto.T
-resultados_proyectados_por_pacto = resultados_proyectados_por_pacto.drop("partido", axis=0)
-
-
-# Crear DataFrame para guardar los resultados, usando pactos como columnas
-pactos_unicos = resultados_proyectados_por_pacto.columns  # Extraer los pactos únicos
-partidos_unicos = resultados_proyectados_distrito.columns
-integracion_pacto = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=pactos_unicos)
-integracion_pacto=integracion_pacto.fillna(0)
-integracion_partido = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=partidos_unicos)
-integracion_partido=integracion_partido.fillna(0)
-# Asegurarse de que la columna 'Distrito' sea el índice de 'escaños'
-escaños = escaños.set_index('Distrito')
-
-# Aplica D'Hondt en cada distrito
-for d in resultados_proyectados_distrito.index:    
-    # Obtener el número de escaños asignados para este distrito
-    n_escaños = escaños.loc[d, 'Diputados']    
-    # Seleccionar la fila correspondiente al distrito en 'resultados_proyectados_por_pacto'
-    fila = resultados_proyectados_por_pacto.loc[d]    
-    # Crear la lista omitiendo los valores iguales a 0
-    votos_por_pacto = fila[fila != 0].tolist()      
-    # Calcular la distribución de escaños con D'Hondt
-    numero_pactos = len(votos_por_pacto)
-    integracion = calcula_dhont(n_escaños, numero_pactos, votos_por_pacto)    
-    # Asignar los resultados al DataFrame
-    # Mapear los resultados de integración al índice de pactos con votos
-    pactos_no_cero = fila[fila != 0].index  # Índices (pactos) con votos
-    for pacto, escaños_asignados in zip(pactos_no_cero, integracion):
-        integracion_pacto.loc[d, pacto] = escaños_asignados
-for indice, row in integracion_pacto.iterrows():
-    for pacto in pactos_unicos:
-        n_electos=row[pacto]
-        partidos=pactos.loc[pactos['pacto']==pacto,'partido'].tolist()
-        n_partidos=len(partidos)
-        votos_partido=resultados_proyectados_distrito.loc[indice,partidos].tolist()
-        integracion_partidos=calcula_dhont(n_electos, n_partidos, votos_partido)
-        for partido, escaños_partido in zip(partidos,integracion_partidos):
-            integracion_partido.loc[indice,partido] = escaños_partido
-                            
-
-
-resultados_proyectados_distrito.to_csv("resultados_proyectados_distrito.csv", encoding= 'utf-8',sep=';')
-resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
-integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
-integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
-#integracion_partido.csv("resultados_url_integracion_partido.csv", encoding= 'utf-8',sep=';')
+# Iterar sobre las columnas de independientes
+for col_ind in independientes_asociados:
+    if col_ind in casos_especiales:
+        # Si es un caso especial, distribuir los votos en partes iguales con castigo del 20%
+        partidos = casos_especiales[col_ind]
+        n_partidos = len(partidos)
+        for partido in partidos:
+            if partido in resultados_proyectados.columns:
+                resultados_proyectados[partido] += (
+                    resultados_proyectados[col_ind]*0.8 / n_partidos
+                )
+    else:
+        # Caso general: sumar al partido principal con un castigo del 20%
+        partido_asociado = col_ind.split("IND - ")[1]
+        if partido_asociado in resultados_proyectados.columns:
+            resultados_proyectados[partido_asociado] += (
+                resultados_proyectados[col_ind] * 0.8
+            )
+    
+    # Eliminar la columna del independiente asociado
+    resultados_proyectados.drop(columns=[col_ind], inplace=True)
+# Asegurarse de que 'comuna' sea una columna explícita
+resultados_proyectados.reset_index(inplace=True)
+resultados_proyectados.rename(columns={'index': 'Comuna'}, inplace=True)
+resultados_proyectados.to_csv("resultados_proyectados.csv", encoding= 'utf-8',sep=';')
