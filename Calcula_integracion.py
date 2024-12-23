@@ -76,7 +76,14 @@ def calcula_dhont(numero_concejales, numero_pactos, votos_por_pacto):
 
 url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
 url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
-url_pactos=r"https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV"
+#pacto partidos
+#url_pactos=r"https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6"
+#pacto convencion
+#url_pactos=r"https://drive.google.com/uc?id=11Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
+#pacto consejo
+#url_pactos=r"https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV"
+#pacto municipal
+url_pactos=r"https://drive.google.com/uc?id=1J1utmL2bLOWL_E9Cnsrirf27Rk3psb9L"
 
 escaños=leer_excel_desde_drive(url_escaños)
 comunas_distrito=leer_excel_desde_drive(url_comunas_distro)

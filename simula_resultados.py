@@ -244,8 +244,17 @@ mediana_concejales = mediana_concejales.applymap(lambda x: np.trunc(x))
 promedio_cores = promedio_cores.applymap(lambda x: np.trunc(x))
 mediana_cores = mediana_cores.applymap(lambda x: np.trunc(x))
 
+# Agregar la fila 'IND - CANDIDATURAS INDEPENDIENTES' con ceros a promedio_cores si no existe
+if 'IND - CANDIDATURAS INDEPENDIENTES' not in promedio_cores.index:
+    promedio_cores.loc['IND - CANDIDATURAS INDEPENDIENTES'] = 0
+
+# Ajustar los valores con la función where
+adjusted_cores = promedio_cores.where(promedio_cores != 0, promedio_concejales)
+adjusted_concejales = promedio_concejales.where(promedio_concejales != 0, promedio_cores)
+
 # Truncar los resultados proyectados después de la división
-resultados_proyectados = (promedio_cores + promedio_concejales) / 2
+# Calcular el promedio con los valores ajustados
+resultados_proyectados = (adjusted_cores + adjusted_concejales) / 2
 resultados_proyectados = resultados_proyectados.applymap(lambda x: np.trunc(x))
 
 #A partir del promedio de cores y concejales se calcular un valor único de votos para cada comuna y partido
