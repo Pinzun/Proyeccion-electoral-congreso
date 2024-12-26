@@ -79,7 +79,7 @@ url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfj
 #pacto partidos
 #url_pactos=r"https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6"
 #pacto convencion
-#url_pactos=r"https://drive.google.com/uc?id=11Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
+#url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
 #pacto consejo
 #url_pactos=r"https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV"
 #pacto municipal
