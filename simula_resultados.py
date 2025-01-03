@@ -137,11 +137,11 @@ El proceso se repetira para concejales y cores"""
 url_concejales= "https://drive.google.com/uc?id=1IjIMMccD2PBs45YrS4XGQxF-IJrQziIV"
 url_cores = r"https://drive.google.com/uc?id=1U2KgH6EFu-Jbcm3c6t27x7UXvl7Lovzc"
 #Activa incumbencias
-#url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
-#url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
+url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
+url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
 #Desactiva incumbencias
-url_incumbencia=r"https://drive.google.com/uc?id=1M_d6Kvpj3bUvv8SST-JGamprjT2FyFYA"
-url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1mLarX73K5oMovM8i5Ix4VmUVDd-_qPeh"
+#url_incumbencia=r"https://drive.google.com/uc?id=1M_d6Kvpj3bUvv8SST-JGamprjT2FyFYA"
+#url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1mLarX73K5oMovM8i5Ix4VmUVDd-_qPeh"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
 
 
