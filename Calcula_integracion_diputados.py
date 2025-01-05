@@ -83,7 +83,15 @@ url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfj
 #pacto consejo
 #url_pactos=r"https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV"
 #pacto municipal
-url_pactos=r"https://drive.google.com/uc?id=1J1utmL2bLOWL_E9Cnsrirf27Rk3psb9L"
+#url_pactos=r"https://drive.google.com/uc?id=1J1utmL2bLOWL_E9Cnsrirf27Rk3psb9L"
+#pacto personalizado 1 CHV+
+#url_pactos=r"https://drive.google.com/uc?id=1-dDlut6F32orBTJxVr_o3i2zD892Zdet"
+#pacto personalizado 1 CHV
+#url_pactos=r"https://drive.google.com/uc?id=1HT2mVFBB2_mHAWUqbI7lvlzycQd4MJsX"
+#pacto personalizado 2 CHV+
+#url_pactos=r"https://drive.google.com/uc?id=1SMo8FuDZsCurOOnqLsWdX1jKoVCYYwip"
+#pacto personalizado 2 CHV
+url_pactos=r"https://drive.google.com/uc?id=1PxqtwIJHOH3ZT1II5eX8Eq-5m1B6zhpY"
 
 escaños=leer_excel_desde_drive(url_escaños)
 comunas_distrito=leer_excel_desde_drive(url_comunas_distro)
