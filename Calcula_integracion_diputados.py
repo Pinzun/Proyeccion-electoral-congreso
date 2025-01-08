@@ -97,7 +97,7 @@ escaños=leer_excel_desde_drive(url_escaños)
 comunas_distrito=leer_excel_desde_drive(url_comunas_distro)
 pactos=leer_excel_desde_drive(url_pactos)
 resultados_proyectados=pd.read_csv("resultados_proyectados.csv", encoding= 'utf-8',sep=';')
-
+resultados_proyectados = resultados_proyectados.loc[:, ~resultados_proyectados.columns.str.contains('^Unnamed')]
 #Se calculan los votos de cada partido por distriro
 # Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice
 comunas_distrito = comunas_distrito.set_index('comuna')
@@ -164,7 +164,7 @@ for indice, row in integracion_pacto.iterrows():
             integracion_partido.loc[indice,partido] = escaños_partido
                             
 
-
+integracion_partido = integracion_partido.rename(columns={'IND - CANDIDATURAS INDEPENDIENTES': 'IND'})
 resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
 integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
 integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
