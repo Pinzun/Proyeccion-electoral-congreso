@@ -78,5 +78,5 @@ resultados_proyectados_territorio_normalizado = resultados_proyectados_territori
 
 # Paso 3: Eliminar la columna 'total_votos' del DataFrame normalizado (si no la necesitas)
 resultados_proyectados_territorio_normalizado = resultados_proyectados_territorio_normalizado.drop(columns=['total_votos'])
-
+resultados_proyectados_territorio_normalizado = resultados_proyectados_territorio_normalizado.rename(columns={'IND - CANDIDATURAS INDEPENDIENTES': 'IND'})
 resultados_proyectados_territorio_normalizado.to_csv("resultados_proyectados_proporciones.csv", encoding= 'utf-8',sep=';')
