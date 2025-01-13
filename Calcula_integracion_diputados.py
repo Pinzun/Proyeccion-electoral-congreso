@@ -164,7 +164,14 @@ for indice, row in integracion_pacto.iterrows():
             integracion_partido.loc[indice,partido] = escaños_partido
                             
 
-integracion_partido = integracion_partido.rename(columns={'IND - CANDIDATURAS INDEPENDIENTES': 'IND'})
+integracion_partido = integracion_partido.rename(columns={
+    'IND - CANDIDATURAS INDEPENDIENTES': 'IND',
+    'AMARILLOS': 'AMA',
+    'EVOPOLI': 'EVO',
+    'IGUALDAD': 'IGU',
+    'POPULAR': 'POP',
+    'DEMOCRATAS': 'DEM',
+    'REPUBLICANO': 'REP'})
 resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
 integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
 integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
