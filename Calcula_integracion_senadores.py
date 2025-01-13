@@ -79,17 +79,25 @@ url_comunas_circun=r"https://drive.google.com/uc?id=1lhFt_SBBUDEPn-eJ84xkaLGBxAl
 #pacto partidos
 #url_pactos=r"https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6"
 #pacto convencion
-url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
+#url_pactos=r"https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn"
 #pacto consejo
 #url_pactos=r"https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV"
 #pacto municipal
 #url_pactos=r"https://drive.google.com/uc?id=1J1utmL2bLOWL_E9Cnsrirf27Rk3psb9L"
+#pacto personalizado 1 CHV+
+#url_pactos=r"https://drive.google.com/uc?id=1-dDlut6F32orBTJxVr_o3i2zD892Zdet"
+#pacto personalizado 1 CHV
+#url_pactos=r"https://drive.google.com/uc?id=1HT2mVFBB2_mHAWUqbI7lvlzycQd4MJsX"
+#pacto personalizado 2 CHV+
+#url_pactos=r"https://drive.google.com/uc?id=1SMo8FuDZsCurOOnqLsWdX1jKoVCYYwip"
+#pacto personalizado 2 CHV
+url_pactos=r"https://drive.google.com/uc?id=1PxqtwIJHOH3ZT1II5eX8Eq-5m1B6zhpY"
 
 escaños=leer_excel_desde_drive(url_escaños)
 comunas_circun=leer_excel_desde_drive(url_comunas_circun)
 pactos=leer_excel_desde_drive(url_pactos)
 resultados_proyectados=pd.read_csv("resultados_proyectados.csv", encoding= 'utf-8',sep=';')
-
+resultados_proyectados = resultados_proyectados.loc[:, ~resultados_proyectados.columns.str.contains('^Unnamed')]
 #Se calculan los votos de cada partido por circuscripcion
 # Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice
 comunas_circun = comunas_circun.set_index('comuna')
@@ -156,7 +164,14 @@ for indice, row in integracion_pacto.iterrows():
             integracion_partido.loc[indice,partido] = escaños_partido
                             
 
-
+integracion_partido = integracion_partido.rename(columns={
+    'IND - CANDIDATURAS INDEPENDIENTES': 'IND',
+    'AMARILLOS': 'AMA',
+    'EVOPOLI': 'EVO',
+    'IGUALDAD': 'IGU',
+    'POPULAR': 'POP',
+    'DEMOCRATAS': 'DEM',
+    'REPUBLICANO': 'REP'})
 resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
 integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
 integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
