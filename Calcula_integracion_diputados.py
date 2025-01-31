@@ -100,16 +100,16 @@ url_pactos=r"https://drive.google.com/uc?id=1imzAeLaauPK63-WSnCDCW8fHpbBcFJ6d"
 '''
 
 pactos_url = {
-    "partidos": "https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6",
-    "convencion": "https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn",
-    "consejo": "https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV",
-    "municipal": "https://drive.google.com/uc?id=1J1utmL2bLOWL_E9Cnsrirf27Rk3psb9L",
-    "personalizado_1_CHV+": "https://drive.google.com/uc?id=1-dDlut6F32orBTJxVr_o3i2zD892Zdet",
-    "personalizado_1_CHV": "https://drive.google.com/uc?id=1HT2mVFBB2_mHAWUqbI7lvlzycQd4MJsX",
-    "personalizado_2_CHV+": "https://drive.google.com/uc?id=1SMo8FuDZsCurOOnqLsWdX1jKoVCYYwip",
-    "personalizado_2_CHV": "https://drive.google.com/uc?id=1PxqtwIJHOH3ZT1II5eX8Eq-5m1B6zhpY",
-    "personalizado_3_CHV+": "https://drive.google.com/uc?id=1plEm7CG3slcySyjZXybAPpApfcWwx85t",
-    "personalizado_3_CHV": "https://drive.google.com/uc?id=1imzAeLaauPK63-WSnCDCW8fHpbBcFJ6d",
+    "EscPart": "https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6",
+    "EscConv": "https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn",
+    "EscCons": "https://drive.google.com/uc?id=1RXvbEtWK5bz7bdfigfr01Jr8XAW74hmV",
+    "EscMun": "https://drive.google.com/uc?id=1J1utmL2bLOWL_E9Cnsrirf27Rk3psb9L",
+    "EscPers1_CHV1": "https://drive.google.com/uc?id=1-dDlut6F32orBTJxVr_o3i2zD892Zdet",
+    "EscPers1_CHV": "https://drive.google.com/uc?id=1HT2mVFBB2_mHAWUqbI7lvlzycQd4MJsX",
+    "EscPers2_CHV1": "https://drive.google.com/uc?id=1SMo8FuDZsCurOOnqLsWdX1jKoVCYYwip",
+    "EscPers2_CHV": "https://drive.google.com/uc?id=1PxqtwIJHOH3ZT1II5eX8Eq-5m1B6zhpY",
+    "EscPers3_CHV1": "https://drive.google.com/uc?id=1plEm7CG3slcySyjZXybAPpApfcWwx85t",
+    "EscPers3_CHV": "https://drive.google.com/uc?id=1imzAeLaauPK63-WSnCDCW8fHpbBcFJ6d",
 }
 
 for nombre_pacto, url in pactos_url.items():
@@ -196,8 +196,8 @@ for nombre_pacto, url in pactos_url.items():
    
     # Guardar los archivos con el nombre del pacto
     resultados_proyectados_por_pacto.to_csv(f"resultados_proyectados_{nombre_pacto}.csv", encoding='utf-8', sep=';')
-    integracion_pacto.to_csv(f"integracion_pacto_{nombre_pacto}.csv", encoding='utf-8-sig', sep=';')
-    integracion_partido.to_csv(f"integracion_partido_{nombre_pacto}.csv", encoding='utf-8-sig', sep=';')
+    integracion_pacto.to_csv(f"resultados_integracion_pacto_{nombre_pacto}.csv", encoding='utf-8-sig', sep=';')
+    integracion_partido.to_csv(f"resultados_integracion_partido_{nombre_pacto}.csv", encoding='utf-8-sig', sep=';')
 
     #resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
     #integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
