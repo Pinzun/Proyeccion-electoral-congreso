@@ -76,7 +76,8 @@ def calcula_dhont(numero_concejales, numero_pactos, votos_por_pacto):
 
 url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
 url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
-'''
+
+"""
 #pacto partidos
 #url_pactos=r"https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6"
 #pacto convencion
@@ -97,8 +98,7 @@ url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfj
 #url_pactos=r"https://drive.google.com/uc?id=1plEm7CG3slcySyjZXybAPpApfcWwx85t"
 #pacto personalizado 3 CHV
 url_pactos=r"https://drive.google.com/uc?id=1imzAeLaauPK63-WSnCDCW8fHpbBcFJ6d"
-'''
-
+"""
 pactos_url = {
     "EscPart": "https://drive.google.com/uc?id=1pDYs6g-DBMOECk74rGwWZS_uf2rdlDE6",
     "EscConv": "https://drive.google.com/uc?id=1Dh2pLORNFTH5u1ni2smJIl044eS0mESn",
