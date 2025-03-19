@@ -17,7 +17,7 @@ nuevas_filas = []
 
 # Iterar sobre el DataFrame original
 for index, row in df.iterrows():
-    if row["partido"] in secuencia and (row["partido"]!=df.iloc[index + 1]["partido"]):
+    if row["partido"] in secuencia and (row["partido"]!=df.iloc[index -1]["partido"]):
         # Crear nueva fila
         nueva_fila = {"partido": None, "candidato": secuencia[row["partido"]], "votos": None,"region":row["region"],"comuna":row["comuna"]}
         nuevas_filas.append((index, nueva_fila))
@@ -47,4 +47,4 @@ print("Suma de votos entre índices consecutivos vacíos:", sumas_votos)
 for key, value in sumas_votos.items():
     df.at[key, "votos"] = value
 
-#df.to_excel(ruta, index=False)
+df.to_excel(ruta, index=False)
