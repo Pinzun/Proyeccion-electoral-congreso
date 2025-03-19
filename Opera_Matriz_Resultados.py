@@ -70,6 +70,8 @@ resultados_proyectados_territorio = resultados_proyectados.groupby('Distrito').s
 #resultados_proyectados_territorio = resultados_proyectados.groupby('Circunscripcion').sum()
 
 resultados_proyectados_territorio.index = resultados_proyectados_territorio.index.astype(int)
+# Eliminar las columnas "Votos Blancos" y "Votos Nulos" del DataFrame
+resultados_proyectados_territorio = resultados_proyectados_territorio.drop(columns=['Votos Blancos', 'Votos Nulos'])
 # Paso 1: Calcular la suma de votos por fila y almacenarlo en una nueva columna
 resultados_proyectados_territorio['total_votos'] = resultados_proyectados_territorio.sum(axis=1)
 
