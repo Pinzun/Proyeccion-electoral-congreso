@@ -95,7 +95,11 @@ url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfj
 #pacto personalizado 3 CHV+
 #url_pactos=r"https://drive.google.com/uc?id=1plEm7CG3slcySyjZXybAPpApfcWwx85t"
 #pacto personalizado 3 CHV
-url_pactos=r"https://drive.google.com/uc?id=1imzAeLaauPK63-WSnCDCW8fHpbBcFJ6d"
+#url_pactos=r"https://drive.google.com/uc?id=1imzAeLaauPK63-WSnCDCW8fHpbBcFJ6d"
+#pacto personalizado 4 CHV+
+#url_pactos=r"https://drive.google.com/uc?id=11PZec7aNrwjWjKtN4zLpv9cvzgUX9IsY"
+#pacto personalizado 4 CHV
+url_pactos=r"https://drive.google.com/uc?id=1A26Qch26887rBD4Y5Ka6jhEZZWDiA8_M"
 
 
 escaños=leer_excel_desde_drive(url_escaños)
