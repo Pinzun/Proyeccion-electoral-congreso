@@ -5,7 +5,6 @@ import numpy as np
 import gdown
 import os
 
-
 # Función para agregar una fila de totales a un DataFrame
 def agregar_totales(df):
     if df.empty:
@@ -85,34 +84,35 @@ def calcula_dhont(numero_concejales, numero_pactos, votos_por_pacto):
     
     return escaños_por_pacto
 
-url_escaños=r"https://drive.google.com/uc?id=1yZsg51IdmOwt7JWQbZ5p7eBLR2n944hN"
-url_comunas_distro=r"https://drive.google.com/uc?id=1SGJXB8iu7384-3a94mV2QFjTMfjbeVpL"
+url_escaños=r"https://drive.google.com/uc?id=1yHZVLAdWY_LGIp-ggsc9IEblf6sK2wa0"
+url_comunas_circun=r"https://drive.google.com/uc?id=1lhFt_SBBUDEPn-eJ84xkaLGBxAl7P8J3"
 
-
+escaños=leer_excel_desde_drive(url_escaños)
+comunas_circun=leer_excel_desde_drive(url_comunas_circun)
 def calcula_integracion(df_edited):    
     escaños=leer_excel_desde_drive(url_escaños)
-    comunas_distrito=leer_excel_desde_drive(url_comunas_distro)
+    comunas_circun=leer_excel_desde_drive(url_comunas_circun)
     resultados_proyectados=pd.read_csv(r"data\resultados_proyectados.csv", encoding= 'utf-8',sep=';')
     resultados_proyectados = resultados_proyectados.loc[:, ~resultados_proyectados.columns.str.contains('^Unnamed')]
     #Se calculan los votos de cada partido por distriro
     # Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice
-    comunas_distrito = comunas_distrito.set_index('comuna')
+    comunas_circun = comunas_circun.set_index('comuna')
     resultados_proyectados = resultados_proyectados.set_index('Comuna')
 
-    # Paso 2: Ahora unimos 'resultados_proyectados_transpuesto' con la columna 'Distrito' de 'comunas_distrito'
-    resultados_proyectados['Distrito'] = resultados_proyectados.index.map(comunas_distrito['Distrito'])
+    # Paso 2: Ahora unimos 'resultados_proyectados_transpuesto' con la columna 'Circunscripcion' de 'comunas_circun'
+    resultados_proyectados['Circunscripcion'] = resultados_proyectados.index.map(comunas_circun['Circunscripcion'])
 
-    # Paso 3: Agrupar por 'Distrito' y sumar los votos de cada partido
-    resultados_proyectados_distrito = resultados_proyectados.groupby('Distrito').sum()
-    resultados_proyectados_distrito.index = resultados_proyectados_distrito.index.astype(int)
+    # Paso 3: Agrupar por 'Circunscripcion' y sumar los votos de cada partido
+    resultados_proyectados_circun = resultados_proyectados.groupby('Circunscripcion').sum()
+    resultados_proyectados_circun.index = resultados_proyectados_circun.index.astype(int)
 
 
     #se procede a calcular el dhont para diputados
 
-    
+ 
     #Se agrupan los votos por pacto
-    # Paso 1: Transponer el DataFrame 'resultados_proyectados_distrito' para que los partidos sean las filas
-    resultados_proyectados_transpuesto = resultados_proyectados_distrito.T
+    # Paso 1: Transponer el DataFrame 'resultados_proyectados_circun' para que los partidos sean las filas
+    resultados_proyectados_transpuesto = resultados_proyectados_circun.T
     resultados_proyectados_transpuesto = resultados_proyectados_transpuesto.rename_axis('partido', axis=1)
     # Paso 2: Unir el DataFrame 'resultados_proyectados_transpuesto' con el DataFrame 'pactos' para agregar la columna 'pacto'
     resultados_proyectados_transpuesto = resultados_proyectados_transpuesto.merge(df_edited, how='left', left_index=True, right_on='partido')
@@ -126,19 +126,19 @@ def calcula_integracion(df_edited):
 
     # Crear DataFrame para guardar los resultados, usando pactos como columnas
     pactos_unicos = resultados_proyectados_por_pacto.columns  # Extraer los pactos únicos
-    partidos_unicos = resultados_proyectados_distrito.columns
-    integracion_pacto = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=pactos_unicos)
+    partidos_unicos = resultados_proyectados_circun.columns
+    integracion_pacto = pd.DataFrame(index=resultados_proyectados_circun.index, columns=pactos_unicos)
     integracion_pacto=integracion_pacto.fillna(0)
-    integracion_partido = pd.DataFrame(index=resultados_proyectados_distrito.index, columns=partidos_unicos)
+    integracion_partido = pd.DataFrame(index=resultados_proyectados_circun.index, columns=partidos_unicos)
     integracion_partido=integracion_partido.fillna(0)
-    # Asegurarse de que la columna 'Distrito' sea el índice de 'escaños'
-    escaños = escaños.set_index('Distrito')
+    # Asegurarse de que la columna 'Circunscripcion' sea el índice de 'escaños'
+    escaños = escaños.set_index('Circunscripcion')
 
-    # Aplica D'Hondt en cada distrito
-    for d in resultados_proyectados_distrito.index:    
-        # Obtener el número de escaños asignados para este distrito
-        n_escaños = escaños.loc[d, 'Diputados']    
-        # Seleccionar la fila correspondiente al distrito en 'resultados_proyectados_por_pacto'
+    # Aplica D'Hondt en cada circunscripcion
+    for d in resultados_proyectados_circun.index:    
+        # Obtener el número de escaños asignados para esta circunscripcion
+        n_escaños = escaños.loc[d, 'Senadores']    
+        # Seleccionar la fila correspondiente a la circunscripcion en 'resultados_proyectados_por_pacto'
         fila = resultados_proyectados_por_pacto.loc[d]    
         # Crear la lista omitiendo los valores iguales a 0
         votos_por_pacto = fila[fila != 0].tolist()      
@@ -155,11 +155,11 @@ def calcula_integracion(df_edited):
             n_electos=row[pacto]
             partidos=df_edited.loc[df_edited['pacto']==pacto,'partido'].tolist()
             n_partidos=len(partidos)
-            votos_partido=resultados_proyectados_distrito.loc[indice,partidos].tolist()
+            votos_partido=resultados_proyectados_circun.loc[indice,partidos].tolist()
             integracion_partidos=calcula_dhont(n_electos, n_partidos, votos_partido)
             for partido, escaños_partido in zip(partidos,integracion_partidos):
                 integracion_partido.loc[indice,partido] = escaños_partido
-                                
+                            
 
     integracion_partido = integracion_partido.rename(columns={
         'IND - CANDIDATURAS INDEPENDIENTES': 'IND',
@@ -169,17 +169,17 @@ def calcula_integracion(df_edited):
         'POPULAR': 'POP',
         'DEMOCRATAS': 'DEM',
         'REPUBLICANO': 'REP'})
-    # Agregar la fila de totales a ambos DataFrames
+    # Lista de circunscripciones a eliminar
+    drop_circuns = [2, 4, 6, 8, 10, 12, 13, 14, 16]
+
+    # Eliminar las filas correspondientes en integracion_pacto e integracion_partido
+    integracion_pacto = integracion_pacto.drop(drop_circuns, errors='ignore')
+    integracion_partido = integracion_partido.drop(drop_circuns, errors='ignore')
     integracion_pacto = agregar_totales(integracion_pacto)
     integracion_partido = agregar_totales(integracion_partido)
     return integracion_pacto, integracion_partido
-    
-    # Guardar los archivos con el nombre del pacto
-    #resultados_proyectados_por_pacto.to_csv(f"resultados_proyectados_{nombre_pacto}.csv", encoding='utf-8', sep=';')
-    #integracion_pacto.to_csv(fr"Resultados\Diputados\Version sin nyb\resultados_integracion_pacto_{nombre_pacto}.csv", encoding='utf-8-sig', sep=';')
-    #integracion_partido.to_csv(fr"Resultados\Diputados\Version sin nyb\resultados_integracion_partido_{nombre_pacto}.csv", encoding='utf-8-sig', sep=';')
 
-        #resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
-        #integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
-        #integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
-        #integracion_partido.csv("resultados_url_integracion_partido.csv", encoding= 'utf-8',sep=';')
+#resultados_proyectados_por_pacto.to_csv("resultados_proyectados_por_pacto.csv", encoding= 'utf-8',sep=';')
+#integracion_pacto.to_csv("resultados_integracion_pacto.csv", encoding= 'utf-8-sig',sep=';')
+#integracion_partido.to_csv("resultados_integracion_partido.csv", encoding= 'utf-8-sig',sep=';')
+#integracion_partido.csv("resultados_url_integracion_partido.csv", encoding= 'utf-8',sep=';')
