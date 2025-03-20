@@ -26,6 +26,14 @@ data = {
 
 df = pd.DataFrame(data)
 
+with open("diagrama_metodologia.drawio.svg", encoding="utf-8") as f:
+    svg_code = f.read()
+
+
+st.title('Diagrama metodológico')
+st.markdown(svg_code, unsafe_allow_html=True)
+
+
 # Mostrar la tabla estilo Excel
 st.title('Constructor de pactos')
 
@@ -54,30 +62,26 @@ if st.button('Calcular Diputados'):
     rp, rpart = calcular_d(df_edited)
     st.session_state['resultados_pacto'] = rp
     st.session_state['resultados_partido'] = rpart
-    # Aplicar el estilo a los DataFrames que se mostrarán
-    rp = st.session_state['resultados_pacto'].style.apply(highlight_totals, axis=1).to_html()
-    rpart = st.session_state['resultados_partido'].style.apply(highlight_totals, axis=1).to_html()
+
 
 
     st.subheader("Resultados Pacto")
-    st.markdown(rp, unsafe_allow_html=True)
+    st.dataframe(rp)
 
 
     st.subheader("Resultados Partido")
-    st.markdown(rpart, unsafe_allow_html=True)
+    st.dataframe(rpart)
 
 if st.button('Calcular Senadores'):
     rp, rpart = calcular_s(df_edited)
     st.session_state['resultados_pacto'] = rp
     st.session_state['resultados_partido'] = rpart
-    # Aplicar el estilo a los DataFrames que se mostrarán
-    rp = st.session_state['resultados_pacto'].style.apply(highlight_totals, axis=1).to_html()
-    rpart = st.session_state['resultados_partido'].style.apply(highlight_totals, axis=1).to_html()
+
 
 
     st.subheader("Resultados Pacto")
-    st.markdown(rp, unsafe_allow_html=True)
+    st.dataframe(rp)
 
 
     st.subheader("Resultados Partido")
-    st.markdown(rpart, unsafe_allow_html=True)
+    st.dataframe(rpart)

@@ -97,7 +97,7 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
     print(f"Límites de variación: {variacion_min} a {variacion_max}")
 
     # Definir un factor constante
-    incumb = 1.078  
+    incumb = 1.117  
     print(f"Factor constante (incumbencia): {incumb}")
     # Definir un factor constante
     incumb_cruz = 1.094  
