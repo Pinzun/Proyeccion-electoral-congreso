@@ -92,7 +92,7 @@ comunas_circun=leer_excel_desde_drive(url_comunas_circun)
 def calcula_integracion(df_edited):    
     escaños=leer_excel_desde_drive(url_escaños)
     comunas_circun=leer_excel_desde_drive(url_comunas_circun)
-    resultados_proyectados=pd.read_csv(r"data\resultados_proyectados.csv", encoding= 'utf-8',sep=';')
+    resultados_proyectados=pd.read_csv(r"data\resultados_proyectados_senadores.csv", encoding= 'utf-8',sep=';')
     resultados_proyectados = resultados_proyectados.loc[:, ~resultados_proyectados.columns.str.contains('^Unnamed')]
     #Se calculan los votos de cada partido por distriro
     # Asegurarnos de que 'comunas_distrito' tiene 'comuna' como índice

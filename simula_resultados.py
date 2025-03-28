@@ -77,7 +77,7 @@ def leer_csv_desde_drive(url):
 
 #Define función que crea las matrices de variación para cada partido
 
-def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion, iteracion, eleccion, part):
+def matriz_votos(partidos, comunas, incumbencia, variacion, iteracion, eleccion, part):
     """Genera una matriz de votos por partido y comuna basada en una combinación
     lineal de un factor constante y una variación pseudoaleatoria.
 
@@ -99,9 +99,6 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
     # Definir un factor constante
     incumb = 1.117  
     print(f"Factor constante (incumbencia): {incumb}")
-    # Definir un factor constante
-    incumb_cruz = 1.094  
-    print(f"Factor constante (incumbencia_cruzada): {incumb_cruz}")
 
     # Crear la matriz de votos
     m_variacion = pd.DataFrame(index=comunas, columns=partidos)
@@ -116,7 +113,7 @@ def matriz_votos(partidos, comunas, incumbencia, incumbencia_cruzada, variacion,
             x = np.random.uniform(variacion_min, variacion_max)
             print(f"    Variación aleatoria generada: {x}")
             # Calcular el voto como combinación lineal: constante + variación
-            m_variacion.loc[comuna, partido] = max(1,incumbencia.loc[comuna,partido]*incumb,incumbencia_cruzada.loc[comuna,partido]*incumb_cruz) + x
+            m_variacion.loc[comuna, partido] = max(1,incumbencia.loc[comuna,partido]*incumb) + x
             print(f"    Valor calculado: {m_variacion.loc[comuna, partido]}")
         sum_com=m_variacion.loc[comuna].sum()-len(partidos)
         if sum_com>1/part.loc[comuna,'Participacion']:
@@ -136,23 +133,18 @@ El proceso se repetira para concejales y cores"""
 
 url_concejales= "https://drive.google.com/uc?id=1IjIMMccD2PBs45YrS4XGQxF-IJrQziIV"
 url_cores = r"https://drive.google.com/uc?id=1U2KgH6EFu-Jbcm3c6t27x7UXvl7Lovzc"
-#Activa incumbencias
-#url_incumbencia=r"https://drive.google.com/uc?id=1YvIryAKIsw53R4D3ty21Bvywq5lmRsPB"
-#url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1yzLzPUnnKRuJw4Si0vO-y8FR_c4iKGkb"
-#Desactiva incumbencias
-url_incumbencia=r"https://drive.google.com/uc?id=1M_d6Kvpj3bUvv8SST-JGamprjT2FyFYA"
-url_incumbencia_cruzada=r"https://drive.google.com/uc?id=1mLarX73K5oMovM8i5Ix4VmUVDd-_qPeh"
+#Activa incumbencia diputados
+#url_incumbencia=r"https://drive.google.com/uc?id=1h7BmU37ETXtTiZGPDtnnjQGGEUCY3BXr"
+#Activa incumbencia senadores
+url_incumbencia=r"https://drive.google.com/uc?id=1-GnglFW_Z1dVLVJCwvIK5T0CofU509PH"
 url_participacion=r"https://drive.google.com/uc?id=1nbtmcbExTNszNUT4uI3_SH1Y-CPtvK8q"
-
 
 concejales=pd.read_csv("concejales2024_definitivo.csv",delimiter=",", encoding="utf-8")
 cores=pd.read_csv("cores2024_definitivo.csv",delimiter=",", encoding="utf-8")
 incumbencia=leer_excel_desde_drive(url_incumbencia)
 # Configurar la columna 'Comuna' como índice
 incumbencia.set_index('Comuna', inplace=True)
-incumbencia_cruzada=leer_excel_desde_drive(url_incumbencia_cruzada)
 # Configurar la columna 'Comuna' como índice
-incumbencia_cruzada.set_index('Comuna', inplace=True)
 participacion=leer_excel_desde_drive(url_participacion)
 # Configurar la columna 'Comuna' como índice
 participacion.set_index('Comuna', inplace=True)
@@ -192,7 +184,7 @@ contador=0
 eleccion="concejales"
 while contador <10: 
 #while contador <100:    
-    m_variacion=matriz_votos(partidos_concejales, comunas_concejales, incumbencia, incumbencia_cruzada, variacion, contador, eleccion, participacion)    
+    m_variacion=matriz_votos(partidos_concejales, comunas_concejales, incumbencia, variacion, contador, eleccion, participacion)    
     resultados_concejales[contador] = concejales_pivot.multiply(m_variacion) 
     resultados_concejales[contador] = resultados_concejales[contador].fillna(0)
     print(f"iteración {contador} de concejales")
@@ -206,7 +198,7 @@ variacion=0.15
 contador=0
 eleccion="cores"
 while contador <10:
-    m_variacion=matriz_votos(partidos_cores, comunas_cores, incumbencia, incumbencia_cruzada, variacion, contador, eleccion, participacion)
+    m_variacion=matriz_votos(partidos_cores, comunas_cores, incumbencia, variacion, contador, eleccion, participacion)
     resultados_cores[contador] = cores_pivot.multiply(m_variacion)
     resultados_cores[contador] = resultados_cores[contador].fillna(0)
 
@@ -304,4 +296,4 @@ for col_ind in independientes_asociados:
 # Asegurarse de que 'comuna' sea una columna explícita
 resultados_proyectados.reset_index(inplace=True)
 resultados_proyectados.rename(columns={'index': 'Comuna'}, inplace=True)
-resultados_proyectados.to_csv("resultados_proyectados.csv", encoding= 'utf-8',sep=';')
+resultados_proyectados.to_csv("resultados_proyectados_senadores.csv", encoding= 'utf-8-sig',sep=';')
